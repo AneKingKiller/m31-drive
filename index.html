@@ -1,0 +1,43 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>M31 Personal Drive</title>
+</head>
+<body style="font-family:Arial,sans-serif;text-align:center;padding:60px 16px">
+  <h2>M31 Personal Drive</h2>
+  <p id="status">Finding your Drive...</p>
+  <p><a id="link" hidden>Open Drive</a></p>
+  <script>
+    async function go() {
+      try {
+        const response = await fetch(
+          "./current.json?ts=" + Date.now(),
+          { cache: "no-store" }
+        );
+        if (!response.ok) throw Error("Unavailable");
+        const data = await response.json();
+        const url = new URL(data.url);
+        if (
+          url.protocol !== "https:" ||
+          !(url.hostname.endsWith(".pinggy-free.link") ||
+            url.hostname.endsWith(".pinggy.link"))
+        ) throw Error("Invalid address");
+
+        const link = document.getElementById("link");
+        link.href = url.href;
+        link.hidden = false;
+        document.getElementById("status").textContent =
+          "Opening your Drive...";
+        location.replace(url.href);
+      } catch {
+        document.getElementById("status").textContent =
+          "Drive is offline or updating. Please try again.";
+      }
+    }
+    go();
+  </script>
+</body>
+</html>
